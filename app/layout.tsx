@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { StarField } from "@/components/starfield/StarField";
+import { StarField } from "@/components/Layout/Starfield/StarField";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
+import { Noto_Sans } from "next/font/google";
+import Footer from "@/components/Layout/Footer/Footer";
+const notoSans = Noto_Sans({
+  variable: "--font-noto-sans",
   subsets: ["latin"],
 });
 
@@ -21,13 +21,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className={`${notoSans.variable} antialiased`}>
+      {/* Plain top-aligned document flow — no full-height flex column. Content
+          that is vertically centred in the viewport re-centres on every height
+          change, which turns any reflow into a visible jump. */}
+      <body className="flex min-h-dvh flex-col">
         <StarField />
         {/* The design layers content over the canvas with an explicit
             stacking context, rather than pushing the canvas to a negative
             z-index. Matching that keeps sticky headers behaving. */}
         <div className="relative z-10 flex flex-1 flex-col">{children}</div>
+        <Footer />
       </body>
     </html>
   );

@@ -4,22 +4,20 @@ import { useFrame } from "@react-three/fiber";
 import { useReducedMotion } from "motion/react";
 import { useMemo, useRef, type RefObject } from "react";
 import type { BufferGeometry } from "three";
-
-/**
- * A faithful port of the design's stars.js. The constants below are its
- * constants — do not retune them without changing the design first.
- */
-export const FIELD_WIDTH = 62;
-export const FIELD_HEIGHT = 34;
-const FIELD_DEPTH = 8;
-
-/** Repulsion radius, squared: stars within 6 world units of the pointer move. */
-const REPEL_RADIUS_SQ = 36;
-const REPEL_STRENGTH = 0.9;
-/** Per-frame lerp back toward the home position — what closes the bubble. */
-const RETURN_RATE = 0.04;
-/** Amplitude of the idle per-star wobble. */
-const WOBBLE = 0.4;
+import {
+  FIELD_DEPTH,
+  FIELD_HEIGHT,
+  FIELD_WIDTH,
+  REPEL_RADIUS_SQ,
+  REPEL_STRENGTH,
+  RETURN_RATE,
+  STAR_COLOR,
+  STAR_COUNT,
+  STAR_OPACITY,
+  STAR_SEED,
+  STAR_SIZE,
+  WOBBLE,
+} from "@/lib/constants";
 
 /**
  * Deterministic PRNG. The design uses Math.random(), but that is impure in
@@ -42,14 +40,15 @@ type StarsProps = {
   count?: number;
 };
 
-export function Stars({ pointer, count = 900 }: StarsProps) {
+export function Stars({ pointer, count = STAR_COUNT }: StarsProps) {
   const geometryRef = useRef<BufferGeometry>(null);
+  const elapsed = useRef(0);
   const reducedMotion = useReducedMotion();
 
   // `home` is where each star rests; `positions` is the live buffer that gets
   // pushed around and eased back every frame.
   const { home, positions } = useMemo(() => {
-    const random = mulberry32(20260807);
+    const random = mulberry32(STAR_SEED);
     const home = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       home[i * 3] = (random() - 0.5) * FIELD_WIDTH;
@@ -59,13 +58,19 @@ export function Stars({ pointer, count = 900 }: StarsProps) {
     return { home, positions: Float32Array.from(home) };
   }, [count]);
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
     const geometry = geometryRef.current;
     if (!geometry) return;
 
+    // Accumulate our own elapsed time from delta rather than reading
+    // state.clock, which is a deprecated THREE.Clock. Clamping also stops a
+    // backgrounded tab from handing back one huge frame and jumping the
+    // wobble forward on return.
+    elapsed.current += Math.min(delta, 0.1);
+    const t = elapsed.current * 1000;
+
     const attribute = geometry.attributes.position;
     const array = attribute.array as Float32Array;
-    const t = state.clock.elapsedTime * 1000;
     const { x: mx, y: my } = pointer.current;
 
     for (let i = 0; i < count; i++) {
@@ -108,10 +113,10 @@ export function Stars({ pointer, count = 900 }: StarsProps) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#9184d9"
-        size={0.14}
+        color={STAR_COLOR}
+        size={STAR_SIZE}
         transparent
-        opacity={0.85}
+        opacity={STAR_OPACITY}
       />
     </points>
   );
