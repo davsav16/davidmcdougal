@@ -157,6 +157,21 @@
   ::selection {
     background: color-mix(in srgb, var(--color-accent) 30%, transparent);
   }
+
+  /* Scroll lock for the open mobile menu — no JS, no writes to
+     document.body.style. The overlay is conditionally rendered, so `:has()` on
+     its id is the whole mechanism.
+
+     On the root element, not body: root overflow propagates to the viewport
+     while html's own used value stays `visible`, so `position: sticky`
+     descendants keep working and the scroll position survives the toggle.
+     The query is the exact complement of the overlay's `md:hidden`, so the
+     desktop layout is never locked. */
+  @media not all and (min-width: 48rem) {
+    html:has(#mobile-menu) {
+      overflow: hidden;
+    }
+  }
 }
 
 /* Nocturne's image treatment — anything darker than the ground falls away */
