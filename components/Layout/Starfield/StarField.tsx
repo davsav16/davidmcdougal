@@ -12,7 +12,7 @@ import {
   MAX_DPR,
   STAR_COUNT,
   STAR_FADE_MS,
-} from "@/lib/constants";
+} from "@/lib/constants/starbackground";
 import { Stars } from "./Stars";
 
 type StarFieldProps = {

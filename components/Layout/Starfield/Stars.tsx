@@ -17,7 +17,7 @@ import {
   STAR_SEED,
   STAR_SIZE,
   WOBBLE,
-} from "@/lib/constants";
+} from "@/lib/constants/starbackground";
 
 /**
  * Deterministic PRNG. The design uses Math.random(), but that is impure in

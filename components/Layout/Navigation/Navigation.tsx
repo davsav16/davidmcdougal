@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CloseIcon, MenuIcon } from "@/components/SvgIcons";
-import { NAV_LINKS, CONTACT_HREF } from "@/lib/constants";
+import { NAV_LINKS, CONTACT_HREF } from "@/lib/constants/navigation";
 
 /**
  * Sticky site header.
